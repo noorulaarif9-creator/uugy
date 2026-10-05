@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Secret Love Story ❤️</title>
+  
+  <!-- External Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Great+Vibes&family=Nunito:wght@600;700;800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       1. GLOBAL VARIABLES & RESET
+       ========================================================================== */
+    :root {
+      --bg-dark: #120019;
+      --bg-gradient: linear-gradient(135deg, #120019 0%, #2a0835 50%, #4a0033 100%);
+      --pink-primary: #ff2a75;
+      --pink-glow: #ff5e98;
+      --rose-gold: #e8a598;
+      --purple-accent: #9d4edf;
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(255, 255, 255, 0.18);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+      --text-light: #ffffff;
+      --text-sub: #f3c6db;
+      --font-title: 'Great Vibes', cursive;
+      --font-letter: 'Quicksand', 'Nunito', sans-serif;
+      --font-polaroid: 'Caveat', cursive;
+      --font-body: 'Poppins', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-dark);
+      background-image: var(--bg-gradient);
+      color: var(--text-light);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Floating Canvas Background */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Floating Hearts Overlay */
+    .floating-hearts-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .heart-particle {
+      position: absolute;
+      color: var(--pink-primary);
+      opacity: 0.6;
+      animation: float-up 6s linear infinite;
+    }
+
+    /* Background Music Control Floating Button */
+    .bgm-control {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .bgm-control:hover {
+      transform: scale(1.1);
+      background: var(--pink-primary);
+    }
+
+    /* ==========================================================================
+       2. PAGE CONTAINER & TRANSITIONS
+       ========================================================================== */
+    .page {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 100vh;
+      padding: 30px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.95) translateY(20px);
+      transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0.6s;
+      z-index: 10;
+    }
+
+    .page.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) translateY(0);
+      z-index: 20;
+    }
+
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: var(--glass-shadow);
+      padding: 2.2rem 1.5rem;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .section-title {
+      font-family: var(--font-title);
+      font-size: 3rem;
+      color: #fff;
+      text-shadow: 0 0 12px var(--pink-primary);
+      margin-bottom: 0.3rem;
+      line-height: 1.2;
+    }
+
+    .section-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      margin-bottom: 1.2rem;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, var(--pink-primary), var(--purple-accent));
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 42, 117, 0.5);
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 0 30px rgba(255, 42, 117, 0.8);
+    }
+
+    /* Toast Notification */
+    .toast-popup {
+      position: fixed;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(30, 10, 35, 0.95);
+      border: 1px solid var(--pink-glow);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      box-shadow: 0 0 20px rgba(255, 42, 117, 0.5);
+      backdrop-filter: blur(10px);
+      font-size: 0.9rem;
+      z-index: 1000;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      text-align: center;
+      max-width: 90vw;
+    }
+
+    .toast-popup.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ==========================================================================
+       3. PAGE 1: PASSWORD PAGE
+       ========================================================================== */
+    .lock-icon {
+      font-size: 2.8rem;
+      color: var(--pink-glow);
+      margin-bottom: 0.8rem;
+      animation: pulse-glow 2s infinite;
+      display: inline-block;
+    }
+
+    .pin-display {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--pink-glow);
+      transition: all 0.2s ease;
+    }
+
+    .pin-dot.filled {
+      background: var(--pink-primary);
+      box-shadow: 0 0 10px var(--pink-primary);
+      transform: scale(1.15);
+    }
+
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    .num-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 600;
+      padding: 12px;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .num-btn:hover {
+      background: rgba(255, 42, 117, 0.35);
+      border-color: var(--pink-glow);
+    }
+
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
+    /* ==========================================================================
+       4. PAGE 2: WELCOME PAGE
+       ========================================================================== */
+    .couple-illustration {
+      width: 160px;
+      height: 160px;
+      margin: 1rem auto 2rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .couple-circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,42,117,0.4) 0%, rgba(0,0,0,0) 70%);
+      position: absolute;
+      animation: pulse-bg 3s infinite ease-in-out;
+    }
+
+    .couple-icons {
+      font-size: 4.2rem;
+      color: var(--pink-glow);
+      filter: drop-shadow(0 0 15px var(--pink-primary));
+      animation: float 3s infinite ease-in-out;
+    }
+
+    /* ==========================================================================
+       5. PAGE 3: LETTER PAGE
+       ========================================================================== */
+    .letter-container {
+      background: #fcf6e8;
+      background-image: repeating-linear-gradient(#fcf6e8 0px, #fcf6e8 31px, #e8dfc8 32px);
+      color: #2b1810;
+      padding: 1.5rem 1.2rem 1.5rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 35px rgba(180, 140, 70, 0.2);
+      max-width: 480px;
+      width: 100%;
+      height: 480px;
+      position: relative;
+      border: 2px solid #d4c08e;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .letter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 10px;
+      border-bottom: 1px dashed #c0ad80;
+      padding-bottom: 8px;
+    }
+
+    .letter-stamp {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #8b5a2b;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .letter-skip-btn {
+      background: rgba(20, 5, 25, 0.85);
+      color: var(--pink-glow);
+      border: 1px solid var(--pink-primary);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    .letter-body-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 8px;
+      margin-bottom: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .letter-text {
+      font-family: var(--font-letter);
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 32px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      text-align: left;
+      color: #2c1503;
+    }
+
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.2em;
+      background-color: var(--pink-primary);
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.7s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .letter-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding-top: 5px;
+    }
+
+    .feather-pen {
+      font-size: 1.8rem;
+      color: var(--purple-accent);
+      transform: rotate(-20deg);
+    }
+
+    .char-fade {
+      display: inline;
+      animation: charAppear 0.15s ease-out forwards;
+    }
+
+    @keyframes charAppear {
+      from { opacity: 0; transform: translateY(2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================================
+       6. PAGE 4: MEMORIES PAGE (8 POLAROIDS CUSTOMIZED GRID)
+       ========================================================================== */
+    .memories-container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .polaroid-grid-8 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .polaroid {
+      background: #ffffff;
+      padding: 8px 8px 12px 8px;
+      border-radius: 4px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      width: 100%;
+      cursor: pointer;
+      position: relative;
+      transform-origin: top center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .polaroid:nth-child(odd) { transform: rotate(-2deg); animation: swing-left 4s infinite ease-in-out alternate; }
+    .polaroid:nth-child(even) { transform: rotate(2deg); animation: swing-right 4s infinite ease-in-out alternate; }
+
+    .polaroid:hover {
+      transform: scale(1.08) rotate(0deg) !important;
+      z-index: 30;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.6);
+    }
+
+    .polaroid-clip {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 10px;
+      height: 18px;
+      background: #c0c0c0;
+      border-radius: 2px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      z-index: 5;
+    }
+
+    .polaroid-img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 2px;
+      background: #eee;
+    }
+
+    .polaroid-caption {
+      color: #222;
+      font-family: var(--font-polaroid);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-top: 6px;
+      text-align: center;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 20px;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-content {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(255, 42, 117, 0.6);
+      transform: scale(0.6);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      object-fit: contain;
+    }
+
+    .lightbox.active .lightbox-content {
+      transform: scale(1);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      color: white;
+      font-size: 2.2rem;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       7. PAGE 5: REASONS I LOVE YOU PAGE (Enclosed inside div, smaller font)
+       ========================================================================== */
+    .reasons-container {
+      width: 100%;
+      max-width: 550px;
+      height: 75vh;
+      max-height: 520px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: var(--glass-shadow);
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+
+    .reasons-grid-wrapper {
+      flex: 1;
+      width: 100%;
+      overflow-y: auto;
+      padding-right: 4px;
+      margin: 0.8rem 0;
+      scroll-behavior: smooth;
+    }
+
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      width: 100%;
+      padding-bottom: 5px;
+    }
+
+    .flip-card {
+      background-color: transparent;
+      height: 100px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+
+    .flip-card-front {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      font-size: 1.8rem;
+    }
+
+    .flip-card-back {
+      background: linear-gradient(135deg, rgba(255,42,117,0.45), rgba(157,78,223,0.45));
+      backdrop-filter: blur(12px);
+      color: white;
+      transform: rotateY(180deg);
+      font-size: 0.72rem;
+      font-weight: 500;
+      line-height: 1.15;
+      border-color: var(--pink-glow);
+    }
+
+    /* ==========================================================================
+       8. PAGE 6: PROPOSAL PAGE
+       ========================================================================== */
+    .proposal-card {
+      position: relative;
+      border-radius: 24px;
+      padding: 2.5rem 1.5rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 0 30px rgba(255, 42, 117, 0.3);
+      border: 1px solid var(--glass-border);
+    }
+
+    .proposal-quote {
+      font-family: var(--font-title);
+      font-size: 2.6rem;
+      margin-bottom: 1.5rem;
+      color: #fff;
+      text-shadow: 0 0 10px var(--pink-glow);
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      min-height: 80px;
+      position: relative;
+      width: 100%;
+    }
+
+    #btn-yes {
+      padding: 14px 35px;
+      font-size: 1.1rem;
+      z-index: 10;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    }
+
+    #btn-no {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ddd;
+      padding: 10px 24px;
+      font-size: 0.95rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.25s ease, opacity 0.4s ease;
+      position: relative;
+      z-index: 5;
+    }
+
+    .btn-group.centered-yes {
+      justify-content: center;
+    }
+
+    .btn-group.centered-yes #btn-yes {
+      transform: scale(1.3) !important;
+      box-shadow: 0 0 45px rgba(255, 42, 117, 0.95);
+      animation: pulse-glow 1.5s infinite alternate;
+    }
+
+    /* ==========================================================================
+       9. PAGE 7: SUCCESS PAGE
+       ========================================================================== */
+    .success-card {
+      max-width: 600px;
+    }
+
+    .big-thank-you {
+      font-family: var(--font-title);
+      font-size: 2.8rem;
+      color: #fff;
+      text-shadow: 0 0 15px var(--pink-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .success-polaroid-grid {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 1.2rem 0;
+      width: 100%;
+    }
+
+    .success-polaroid {
+      background: white;
+      padding: 6px 6px 12px 6px;
+      border-radius: 4px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      width: 130px;
+      cursor: pointer;
+    }
+
+    .success-polaroid-img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 2px;
+      background: #eee;
+    }
+
+    .success-polaroid-caption {
+      color: #222;
+      font-family: var(--font-polaroid);
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       10. KEYFRAME ANIMATIONS
+       ========================================================================== */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 15px rgba(255, 42, 117, 0.4); transform: scale(1); }
+      50% { box-shadow: 0 0 30px rgba(255, 42, 117, 0.8); transform: scale(1.05); }
+    }
+
+    @keyframes pulse-bg {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.2); opacity: 0.6; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes float-up {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    @keyframes swing-left {
+      0% { transform: rotate(-3deg); }
+      100% { transform: rotate(1deg); }
+    }
+
+    @keyframes swing-right {
+      0% { transform: rotate(1deg); }
+      100% { transform: rotate(-3deg); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+
+    /* ==========================================================================
+       11. ENHANCED MOBILE RESPONSIVE DESIGN
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .polaroid-grid-8 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .polaroid-img {
+        height: 125px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Canvas Background -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- Floating Hearts Background Container -->
+  <div class="floating-hearts-container" id="hearts-container"></div>
+
+  <!-- Background Audio Player -->
+  <audio id="bgm-audio" loop>
+    <source src="assets/bgm-1.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <!-- BGM Toggle Floating Button -->
+  <button class="bgm-control" id="bgm-toggle-btn" onclick="toggleBgm()" title="Play/Pause Music">
+    <i class="fas fa-music" id="bgm-icon"></i>
+  </button>
+
+  <!-- Toast Notification Popup -->
+  <div class="toast-popup" id="toast">Funny Text Here 😂</div>
+
+  <!-- PAGE 1: PASSWORD PAGE -->
+  <section class="page active" id="page-password">
+    <div class="glass-card" id="password-card">
+      <div class="lock-icon"><i class="fas fa-lock"></i></div>
+      <h1 class="section-title">Enter Our Secret Code ❤️</h1>
+      <p class="section-subtitle">Only you can unlock my heart</p>
+
+      <div class="pin-display">
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+      </div>
+
+      <div class="numpad">
+        <button class="num-btn" onclick="pressNum('1')">1</button>
+        <button class="num-btn" onclick="pressNum('2')">2</button>
+        <button class="num-btn" onclick="pressNum('3')">3</button>
+        <button class="num-btn" onclick="pressNum('4')">4</button>
+        <button class="num-btn" onclick="pressNum('5')">5</button>
+        <button class="num-btn" onclick="pressNum('6')">6</button>
+        <button class="num-btn" onclick="pressNum('7')">7</button>
+        <button class="num-btn" onclick="pressNum('8')">8</button>
+        <button class="num-btn" onclick="pressNum('9')">9</button>
+        <button class="num-btn" onclick="clearPin()"><i class="fas fa-undo-alt" style="font-size:0.85rem"></i></button>
+        <button class="num-btn" onclick="pressNum('0')">0</button>
+        <button class="num-btn" onclick="deletePin()"><i class="fas fa-backspace" style="font-size:0.85rem"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 2: WELCOME PAGE -->
+  <section class="page" id="page-welcome">
+    <div class="glass-card">
+      <h1 class="section-title">Happy Birthday Bujjuuuhhhhh! 🥳💖✨</h1>
+      <p class="section-subtitle">"Un birthday vida, un life-la naan irukradhu dhaan enakku celebration. Happiest birthday, my constanttt 🫶🏻♾️🫀"</p>
+
+      <div class="couple-illustration">
+        <div class="couple-circle"></div>
+        <div class="couple-icons"><i class="fas fa-heart-circle-bolt"></i></div>
+      </div>
+
+      <button class="btn-primary" onclick="nextPage('page-letter')">
+        Begin Our Journey <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- PAGE 3: LETTER PAGE -->
+  <section class="page" id="page-letter">
+    <div class="letter-container">
+      <div class="letter-header">
+        <span class="letter-stamp"><i class="fas fa-envelope-open-text"></i> From My Heart</span>
+        <button class="letter-skip-btn" id="skip-letter-btn" onclick="skipLetter()">Skip <i class="fas fa-forward"></i></button>
+      </div>
+      <div class="letter-body-wrapper" id="letter-scroll-wrapper">
+        <div class="letter-text" id="typed-letter"></div>
+      </div>
+      <div class="letter-footer">
+        <div class="feather-pen"><i class="fas fa-feather-pointed"></i></div>
+      </div>
+    </div>
+    
+    <button class="btn-primary" id="letter-next-btn" style="margin-top: 1.5rem; display: none;" onclick="nextPage('page-memories')">
+      Look at Our Memories <i class="fas fa-images"></i>
+    </button>
+  </section>
+
+  <!-- PAGE 4: MEMORIES PAGE (8 POLAROID IMAGES) -->
+  <section class="page" id="page-memories">
+    <div class="memories-container">
+      <h1 class="section-title">Our Sweet Memories ❤️</h1>
+      <p class="section-subtitle">8 Special moments frozen in time, forever in my heart</p>
+
+      <div class="polaroid-grid-8">
+        <!-- 1 -->
+        <div class="polaroid" onclick="openLightbox('assets/img-1.jpg', 'My World')">
+          <div class="polaroid-clip"></div>
+          <img class="polaroid-img" src="assets/img-1.jpg" alt="Memory 1">
+          <div class="polaroid-caption">My World 🌍</div>
+        </div>
+        <!-- 2 -->
+        <div class="polaroid" onclick="openLightbox('assets/img-2.jpg', 'Sweet Moments')">
+          <div class="polaroid-clip"></div>
+          <img class="polaroid-img" src="assets/img-2.jpg" alt="Memory 2">
+          <div class="polaroid-caption">My EVERYTHING ✨</div>
+        </div>
+        <!-- 3 -->
+        <div class="polaroid" onclick="openLightbox('assets/img-3.jpg', 'My Peace')">
+          <div class="polaroid-clip"></div>
+          <img class="polaroid-img" src="assets/img-3.jpg" alt="Memory 3">
+          <div class="polaroid-caption">My Peace 🫂</div>
+        </div>
+        <!-- 4 -->
+        <div class="polaroid" onclick="openLightbox('assets/img-4.jpg', 'Endless Smiles')">
+          <div class="polaroid-clip"></div>
+          <img class="polaroid-img" src="assets/img-4.jpg" alt="Memory 4">
+          <div class="polaroid-caption">Smiles 😊</div>
+        </div>
+        <!-- 5 -->
+        <div class="polaroid" onclick="openLightbox('assets/img-5.jpg', 'Pure Joy')">
+          <div class="polaroid-clip"></div>
+          <img class="polaroid-img" src="assets/img-5.jpg" alt="Memory 5">
+          <div class="polaroid-caption">Pure Joy 💞</div>
+        </div>
+        <!-- 6 -->
+        <div class="polaroid" onclick="openLightbox('assets/img-6.jpg', 'Forever Us')">
+          <div class="polaroid-clip"></div>
+          <img class="polaroid-img" src="assets/img-6.jpg" alt="Memory 6">
+          <div class="polaroid-caption">Forever Us ♾️</div>
+        </div>
+        <!-- 7 -->
+        <div class="polaroid" onclick="openLightbox('assets/img-7.jpg', 'Magic Moments')">
+          <div class="polaroid-clip"></div>
+          <img class="polaroid-img" src="assets/img-7.jpg" alt="Memory 7">
+          <div class="polaroid-caption">Rare Gem 💎</div>
+        </div>
+        <!-- 8 -->
+        <div class="polaroid" onclick="openLightbox('assets/img-8.jpg', 'True Love')">
+          <div class="polaroid-clip"></div>
+          <img class="polaroid-img" src="assets/img-8.jpg" alt="Memory 8">
+          <div class="polaroid-caption">True Love ❤️</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="margin-top: 1.5rem;" onclick="nextPage('page-reasons')">
+        Why I Love You <i class="fas fa-heart"></i>
+      </button>
+    </div>
+
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+      <span class="lightbox-close">&times;</span>
+      <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged Memory">
+    </div>
+  </section>
+
+  <!-- PAGE 5: REASONS I LOVE YOU PAGE (Enclosed inside div, smaller font) -->
+  <section class="page" id="page-reasons">
+    <div class="reasons-container">
+      <h1 class="section-title" style="font-size: 2.4rem; margin-bottom: 0.1rem;">8 Reasons Why I Love You ❤️</h1>
+      <p class="section-subtitle" style="margin-bottom: 0.5rem;">Click each card to reveal a secret reason</p>
+
+      <div class="reasons-grid-wrapper">
+        <div class="reasons-grid">
+          <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">1</div>
+              <div class="flip-card-back">Nee vandhu un life enna prioritize panraa..Enakku nu time spend panraa....🥹🫶</div>
+            </div>
+          </div>
+
+          <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">2</div>
+              <div class="flip-card-back">Namma rendu perukkum ullaadi evlo sanda vandhaalum...nee eankitta vandhu sorry kekkuraa...🤌😩</div>
+            </div>
+          </div>
+
+          <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">3</div>
+              <div class="flip-card-back">Un kuda irukra andha konjam time la nee vandhu Enna safe ah fell panna vaikraaa..😚🥰</div>
+            </div>
+          </div>
+
+          <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">4</div>
+              <div class="flip-card-back">Nee enna Yaar kittayum vittu kudukkaama Enna happy ah feel panna vaikra..♾️🥺</div>
+            </div>
+          </div>
+
+          <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">5</div>
+              <div class="flip-card-back">Ennoda worst days la lam nee Enakku kudukra andha support vandhu romba perusu....🤌😭</div>
+            </div>
+          </div>
+
+          <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">6</div>
+              <div class="flip-card-back">Nee ean kuda irukkumbodhu mattum dha naan naana irukkenn...🥰❤️</div>
+            </div>
+          </div>
+
+          <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">7</div>
+              <div class="flip-card-back">Unnoda understanding levell...andha understanding illana namma ivlo years serndhu irundhirukka maattomm...😘🫶</div>
+            </div>
+          </div>
+
+          <div class="flip-card" onclick="flipCard(this)">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">8</div>
+              <div class="flip-card-back">Ennoda emotions ah purijuppaa...naan unkitta onnumillaaa nu sonna kuda nee vandhu eankitta pesi enna problem nu purinjukittu oru nalla solution tharuvaaa...🥺🧿🫶</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="padding: 10px 24px; font-size: 0.95rem;" onclick="nextPage('page-proposal')">
+        I Have A Question... <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- PAGE 6: PROPOSAL PAGE -->
+  <section class="page" id="page-proposal">
+    <div class="glass-card proposal-card">
+      <h1 class="proposal-quote">Will you be my forever? ♾️💖🥺</h1>
+      <p class="section-subtitle">"Ean life la irukra Ella dark days ah uhm colourfulll ah change panra velichama dha nee vandhaa...♾️💍 Thanks for bringing so much magic into my little world chellakuttyyyy...🤌🥹💋"</p>
+
+      <div class="btn-group" id="proposal-btn-group">
+        <button class="btn-primary" id="btn-yes" onclick="acceptProposal()">YES ❤️</button>
+        <button id="btn-no" onclick="dodgeNoButton()" onmouseover="dodgeNoButton()">NO 😜</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 7: SUCCESS PAGE -->
+  <section class="page" id="page-success">
+    <div class="glass-card success-card">
+      <h1 class="big-thank-you">You Made Me The Happiest ❤</h1>
+      <p class="section-subtitle">Once again happiest birthday bujjuuuhhhhh💋💍👑LYSM💋🎀</p>
+
+      <div class="success-polaroid-grid">
+        <div class="success-polaroid" onclick="openLightbox('assets/img-5.jpg', 'Together Forever')">
+          <img class="success-polaroid-img" src="assets/img-9.jpg" alt="Love 1">
+          <div class="success-polaroid-caption">Together</div>
+        </div>
+
+        <div class="success-polaroid" onclick="openLightbox('assets/img-6.jpg', 'My World')">
+          <img class="success-polaroid-img" src="assets/img-10.jpg" alt="Love 2">
+          <div class="success-polaroid-caption">My World</div>
+        </div>
+
+        <div class="success-polaroid" onclick="openLightbox('assets/img-7.jpg', 'Forever & Always')">
+          <img class="success-polaroid-img" src="assets/img-11.jpg" alt="Love 3">
+          <div class="success-polaroid-caption">Forever</div>
+        </div>
+      </div>
+
+      <p style="font-size: 0.88rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 1.2rem;">
+        And naan wish panren un next birthdays ellam naan un pakkathula irundhu celebrate pannanum nu...🥹😘 ...LYSMM💋♾️... I wishhh namma seekram marriage pannikkanum nu...💍♾️
+      </p>
+
+      <button class="btn-primary" onclick="restartJourney()">
+        Replay Our Story <i class="fas fa-redo"></i>
+      </button>
+    </div>
+  </section>
+
+  <script>
+    const CORRECT_PIN = "1908";
+    let currentPin = "";
+    let noAttempts = 0;
+    let typingTimeout = null;
+    let isTyping = false;
+    let isBgmPlaying = false;
+
+    // Background Music Control
+    function toggleBgm() {
+      const audio = document.getElementById('bgm-audio');
+      const icon = document.getElementById('bgm-icon');
+      
+      if (isBgmPlaying) {
+        audio.pause();
+        icon.className = "fas fa-music";
+        showToast("Music Paused 🔇");
+      } else {
+        audio.play().then(() => {
+          icon.className = "fas fa-volume-high";
+          showToast("Playing Our Song 🎶");
+        }).catch(e => {
+          showToast("Add 'assets/bgm.mp3' file first! ⚠");
+        });
+      }
+      isBgmPlaying = !isBgmPlaying;
+    }
+
+    const funnyTexts = [
+      "Correct ah press pannuda 😂",
+      "Athu illa 😜",
+      "Konjam yosichu paru ❤️",
+      "Close 😏",
+      "Nee cheat pannadha 😂",
+      "Try again baby 🥺",
+      "Oho... wrong pin! 😋"
+    ];
+
+    const noTexts = [
+      "Think Again 😂",
+      "Really? 😏",
+      "Nice try! 😋",
+      "You belong with me 😜",
+      "YES thaan press pannanum! ❤️"
+    ];
+
+    const fullLetterText = 
+      `Happiest birthday, my love ❤️\n\n3 years aachu namma journey start panni… but still, nee enakku first day maari dhaan special. 🥹\nDistance irundhaalum, enakku nee eppovume romba close-ah irukradhu maadhiri dhaan feel aagudhu💎🤍\nUn kooda pesura konjam neram kooda en whole day-a happy ah change pannidumm..🤌❤️‍🩹\nNamma random talks, silly fights, random laughs… ellame enakku romba special🫶🏻\nSometimes unna romba miss pannuven… but andha missing kooda enakku nalla dha irukkum because andha time la dha nee Enakku evlo important nu Enakku puriyum...😩💋\n\nNamma first meet lam Enakku innum nalla nyabagam irukku. 🥹❤️\nNee happy-ah irukkanum nu naan eppovumey wish pannuvenn..😻....Un life la nee nenacha ellam nadakkumm...\nLife la evlo kashtam vandhaalum un kuda un bad days un periya support ah naan iruppenn....😭🎀...\nEppovumey nee thaniya irukra nu lam feel pannaadhaa... ean na naan unakku irukkenn....🫶💖\n\nNamma rendu perum perfect illa , namma relationship uhm perfect illa… but enakku namma love romba special...😘🫶\nNamma relationship la neraya problems lam vandhirukku...but adhu lam thaandi namma love dha perusu nu proove pannirukkom....🧿😭💖..\nof course namma life la neraya misunderstanding irundhichuu...but ini adhu ellam illama happy ah iruppommmm...🫶🧿🥰\nInnum neraya memories namma serndhu create pannanum...🥰\nOne day indha long distance lam illama daily unna paakanummm...😩\nAdhu varaikum namma irukra time la kutti kutti moments lam create pannittu happy ah iruppommmm...💖\n\nThank you for being there and for making my life meaningfulll♾️\nLoveee youuuuu babehhhh💋💖🤌😭..\nNaan unna romba miss panrennnnnn....😭♾️💋\nHappy birthday once again myyy loveee🎀🧿`;
+
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      toast.innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    function nextPage(pageId) {
+      const activePage = document.querySelector('.page.active');
+      const targetPage = document.getElementById(pageId);
+
+      if (activePage) {
+        activePage.classList.remove('active');
+      }
+
+      setTimeout(() => {
+        targetPage.classList.add('active');
+
+        if (pageId === 'page-letter') {
+          startLetterTyping();
+        }
+      }, 400);
+    }
+
+    function pressNum(num) {
+      if (currentPin.length < 4) {
+        currentPin += num;
+        updatePinDisplay();
+
+        const randomMsg = funnyTexts[Math.floor(Math.random() * funnyTexts.length)];
+        showToast(randomMsg);
+
+        if (currentPin.length === 4) {
+          setTimeout(checkPin, 300);
+        }
+      }
+    }
+
+    function deletePin() {
+      currentPin = currentPin.slice(0, -1);
+      updatePinDisplay();
+    }
+
+    function clearPin() {
+      currentPin = "";
+      updatePinDisplay();
+    }
+
+    function updatePinDisplay() {
+      const dots = document.querySelectorAll('.pin-dot');
+      dots.forEach((dot, index) => {
+        if (index < currentPin.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      });
+    }
+
+    function checkPin() {
+      const card = document.getElementById('password-card');
+
+      if (currentPin === CORRECT_PIN) {
+        triggerConfetti();
+        showToast("Unlocked My Heart! ❤️");
+        
+        if (!isBgmPlaying) {
+          const audio = document.getElementById('bgm-audio');
+          audio.play().then(() => {
+            document.getElementById('bgm-icon').className = "fas fa-volume-high";
+            isBgmPlaying = true;
+          }).catch(e => {});
+        }
+
+        setTimeout(() => {
+          nextPage('page-welcome');
+        }, 800);
+      } else {
+        card.classList.add('shake');
+        showToast("Sad Emoji 🥺 Wrong Passcode!");
+        setTimeout(() => {
+          card.classList.remove('shake');
+          clearPin();
+        }, 600);
+      }
+    }
+
+    function startLetterTyping() {
+      const letterElement = document.getElementById('typed-letter');
+      const scrollWrapper = document.getElementById('letter-scroll-wrapper');
+      const skipBtn = document.getElementById('skip-letter-btn');
+      const nextBtn = document.getElementById('letter-next-btn');
+
+      letterElement.innerHTML = "";
+      skipBtn.style.display = "block";
+      nextBtn.style.display = "none";
+      isTyping = true;
+
+      const cursor = document.createElement('span');
+      cursor.className = 'typing-cursor';
+      letterElement.appendChild(cursor);
+
+      let index = 0;
+      clearTimeout(typingTimeout);
+
+      function typeNextChar() {
+        if (!isTyping) return;
+
+        if (index < fullLetterText.length) {
+          const char = fullLetterText.charAt(index);
+          
+          if (char === '\n') {
+            const br = document.createElement('br');
+            letterElement.insertBefore(br, cursor);
+          } else {
+            const span = document.createElement('span');
+            span.className = 'char-fade';
+            span.textContent = char;
+            letterElement.insertBefore(span, cursor);
+          }
+
+          index++;
+          scrollWrapper.scrollTop = scrollWrapper.scrollHeight;
+
+          let delay = 50; 
+          if (char === '\n') delay = 350;
+          else if (char === '.' || char === '?' || char === '!') delay = 400;
+          else if (char === ',') delay = 200;
+          else if (char === ' ') delay = 60;
+          else delay = Math.floor(Math.random() * 20) + 40;
+
+          typingTimeout = setTimeout(typeNextChar, delay);
+        } else {
+          finishLetterTyping();
+        }
+      }
+
+      typeNextChar();
+    }
+
+    function skipLetter() {
+      isTyping = false;
+      clearTimeout(typingTimeout);
+      const letterElement = document.getElementById('typed-letter');
+      const scrollWrapper = document.getElementById('letter-scroll-wrapper');
+      
+      const formattedText = fullLetterText.replace(/\n/g, '<br>');
+      letterElement.innerHTML = formattedText;
+      scrollWrapper.scrollTop = scrollWrapper.scrollHeight;
+      finishLetterTyping();
+    }
+
+    function finishLetterTyping() {
+      isTyping = false;
+      const cursor = document.querySelector('.typing-cursor');
+      if (cursor) cursor.remove();
+      
+      document.getElementById('skip-letter-btn').style.display = "none";
+      document.getElementById('letter-next-btn').style.display = "inline-flex";
+    }
+
+    function openLightbox(src, caption) {
+      const lightbox = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      lightbox.classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    function flipCard(card) {
+      card.classList.toggle('flipped');
+    }
+
+    function dodgeNoButton() {
+      const noBtn = document.getElementById('btn-no');
+      const yesBtn = document.getElementById('btn-yes');
+      const btnGroup = document.getElementById('proposal-btn-group');
+
+      if (noAttempts >= 5) return;
+      noAttempts++;
+
+      if (noAttempts < 5) {
+        const msg = noTexts[noAttempts - 1] || "Try pressing YES! ❤️";
+        showToast(msg);
+
+        const x = (Math.random() - 0.5) * 140;
+        const y = (Math.random() - 0.5) * 80;
+        const rot = (Math.random() - 0.5) * 30;
+
+        noBtn.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(${1 - noAttempts * 0.1})`;
+        yesBtn.style.transform = `scale(${1 + noAttempts * 0.08})`;
+      } 
+      
+      if (noAttempts === 5) {
+        noBtn.style.opacity = "0";
+        noBtn.style.pointerEvents = "none";
+        
+        setTimeout(() => {
+          noBtn.style.display = "none";
+          btnGroup.classList.add('centered-yes');
+          yesBtn.style.transform = "scale(1.3)";
+          showToast("No option gone! Only YES now ❤️");
+        }, 200);
+      }
+    }
+
+    function acceptProposal() {
+      triggerConfetti();
+      triggerFireworks();
+      nextPage('page-success');
+    }
+
+    function restartJourney() {
+      noAttempts = 0;
+      const noBtn = document.getElementById('btn-no');
+      const yesBtn = document.getElementById('btn-yes');
+      const btnGroup = document.getElementById('proposal-btn-group');
+
+      btnGroup.classList.remove('centered-yes');
+      noBtn.style.display = "inline-block";
+      noBtn.style.opacity = "1";
+      noBtn.style.pointerEvents = "auto";
+      noBtn.style.transform = "none";
+      yesBtn.style.transform = "none";
+
+      clearPin();
+      nextPage('page-welcome');
+    }
+
+    // Canvas Background Particles
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height + canvas.height;
+        this.size = Math.random() * 3 + 1;
+        this.speedY = Math.random() * 1 + 0.5;
+        this.opacity = Math.random() * 0.5 + 0.2;
+      }
+      update() {
+        this.y -= this.speedY;
+        if (this.y < -10) this.reset();
+      }
+      draw() {
+        ctx.fillStyle = `rgba(255, 94, 152, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 45; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    function createFloatingHeart() {
+      const container = document.getElementById('hearts-container');
+      const heart = document.createElement('div');
+      heart.classList.add('heart-particle');
+      heart.innerHTML = '<i class="fas fa-heart"></i>';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.fontSize = (Math.random() * 14 + 10) + 'px';
+      heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+      container.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 7000);
+    }
+    setInterval(createFloatingHeart, 650);
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+    }
+
+    function triggerFireworks() {
+      if (typeof confetti === 'function') {
+        const duration = 3 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+        const interval = setInterval(function() {
+          const timeLeft = animationEnd - Date.now();
+          if (timeLeft <= 0) return clearInterval(interval);
+          const particleCount = 50 * (timeLeft / duration);
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+          confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+        }, 250);
+      }
+    }
+
+    function randomInRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+  </script>
+</body>
+</html>
